@@ -1,4 +1,4 @@
-import { Link, NavLink, useLocation } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useState, useRef } from "react";
 const SidebarGroup = ({ label, children }) => {
   const [open, setOpen] = useState(false);
@@ -16,10 +16,18 @@ const SidebarGroup = ({ label, children }) => {
   );
 };
 
-const Sidebar = () => {
+const Sidebar = ({ onLogout }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const drawerTimeout = useRef(null);
+
+  // Logout handler
+  const handleLogout = () => {
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("user");
+    navigate("/login");
+  };
 
   const autoCloseDrawer = (target) => {
     setDrawerOpen(false);
@@ -29,7 +37,36 @@ const Sidebar = () => {
 
   const sidebarContent = (
     <>
-      <h1 className="text-xl font-bold mb-6">🏠ProAuctions</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-xl font-bold flex items-center gap-2">
+          🏠ProAuctions
+        </h1>
+        <button
+          onClick={() => {
+            localStorage.removeItem("isLoggedIn");
+            if (onLogout) onLogout();
+            navigate("/login", { replace: true });
+          }}
+          title="Logout"
+          className="text-red-500 hover:text-red-700 p-1 rounded-full focus:outline-none focus:ring-2 focus:ring-red-400"
+        >
+          {/* Logout Icon (SVG) */}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="w-6 h-6"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6A2.25 2.25 0 005.25 5.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M18 15l3-3m0 0l-3-3m3 3H9"
+            />
+          </svg>
+        </button>
+      </div>
       <nav className="flex flex-col gap-4">
         <NavLink
           to="/dashboard"
